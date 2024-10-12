@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://cyqjjas3plugi"]
+[gd_scene load_steps=4 format=3 uid="uid://cyqjjas3plugi"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_kamue"]
+[ext_resource type="Script" path="res://piped_shell.gd" id="2_w1xnr"]
+
+[sub_resource type="SystemFont" id="SystemFont_gmwnd"]
+font_names = PackedStringArray("Monospace")
 
 [node name="Main" type="PanelContainer"]
 anchors_preset = 15
@@ -20,7 +24,20 @@ theme_override_constants/margin_bottom = 20
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 
+[node name="ShellBox" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ShellLbl" type="Label" parent="MarginContainer/VBoxContainer/ShellBox"]
+layout_mode = 2
+text = "Shell: "
+
+[node name="LineEdit" type="LineEdit" parent="MarginContainer/VBoxContainer/ShellBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "bash"
+
 [node name="Input" type="TextEdit" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -29,7 +46,7 @@ layout_mode = 2
 
 [node name="PastBtn" type="Button" parent="MarginContainer/VBoxContainer/ButtonsHBox"]
 layout_mode = 2
-text = "Past (Ctrl+V)"
+text = "Paste (Ctrl+Shift+V)"
 
 [node name="Control" type="Control" parent="MarginContainer/VBoxContainer/ButtonsHBox"]
 layout_mode = 2
@@ -39,11 +56,22 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "Run (Ctrl+Enter)"
 
-[node name="Console" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 2.0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Console" type="RichTextLabel" parent="MarginContainer/VBoxContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
 focus_mode = 2
+theme_override_fonts/normal_font = SubResource("SystemFont_gmwnd")
+theme_override_font_sizes/normal_font_size = 12
+bbcode_enabled = true
 scroll_following = true
 tab_size = 2
 context_menu_enabled = true
@@ -60,3 +88,11 @@ size_flags_horizontal = 3
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Quit (Ctrl+Q)"
+
+[node name="PipedShell" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_w1xnr")
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsHBox/PastBtn" to="." method="paste_from_clipboard"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsHBox/RunBtn" to="." method="run"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/QuitBtn" to="." method="request_quit"]
