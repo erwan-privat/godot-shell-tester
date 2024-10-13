@@ -5,7 +5,7 @@ extends PanelContainer
 
 const TMP_SCRIPT_PATH := "user://tmp_script"
 const SHEBANG := "#!/usr/bin/env "
-const INPUT_DELAY_SEC := 0.1
+const INPUT_DELAY_SEC := 0.3
 
 # var _input_history: Array[String]
 var _in_input_delay := false

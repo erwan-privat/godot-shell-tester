@@ -27,7 +27,13 @@ var _pid: int = 0
 func abort():
 	if _pid == 0:
 		return
-	OS.kill(_pid)
+	
+	if _thread.is_alive():
+		OS.kill(_pid)
+	else:
+		_pid = 0
+		return
+		
 	_stdio.close()
 	print("killed pid ", _pid)
 	_pid = 0
