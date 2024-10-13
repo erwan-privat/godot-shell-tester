@@ -10,16 +10,13 @@ extends Node
 ## callback as it will not interpret the BBCode correctly.
 ## a quick fix for that can be using a lambda function
 ## appending directly like `func (t): $RichTextLabel += t`.
-## FIXME stderr is always printed after stdout, redirection
-## possible? Maybe is OS.execution source.
-## TODO /usr/bin/env python3,bash,...
-## TODO use signals instead of callback?
 ## TODO add export var to activate auto \n,\r\n appending
 
 
 signal output(line: String)
 
 @export var use_bbcode_stderr: bool = true
+@export var line_ending := "\n"
 var _thread: Thread
 var _stdio: FileAccess
 var _stderr: FileAccess
@@ -46,43 +43,10 @@ func run(command: String, args: PackedStringArray = [],
 	_thread.start(_shell.bind(command, args))
 
 
-func _shell1(command: String, args: PackedStringArray,
-		cb: Callable) -> void:
-	
-	var dic := OS.execute_with_pipe(command, args)
-
-	_stdio = dic.stdio
-	_stderr = dic.stderr
-	_pid = dic.pid
-
-	print("started process id %d\n" % _pid)
-	cb.call_deferred("started process id %d\n" % _pid)
-
-	while _stdio.is_open() and _stdio.get_error() == OK:
-		var c = char(_stdio.get_8())
-
-		if use_bbcode_stderr:
-			if c == "[":
-				c = "[lb]"
-			elif c == "]":
-				c = "[rb]"
-
-		cb.call_deferred(c)
-
-	if use_bbcode_stderr:
-		cb.call_deferred("[color=#ff8800]")
-
-	while _stderr.is_open() and _stderr.get_error() == OK:
-		cb.call_deferred(char(_stderr.get_8()))
-
-	if use_bbcode_stderr:
-		cb.call_deferred("[/color]")
-
-	_thread.wait_to_finish.call_deferred()
-
 func _shell(command: String, args: PackedStringArray) \
 		-> void:
-			
+	
+	OS.execute("chmod", ["u+x", command])
 	var dic := OS.execute_with_pipe(command, args)
 	_stdio = dic.stdio
 	_stderr = dic.stderr
@@ -90,7 +54,7 @@ func _shell(command: String, args: PackedStringArray) \
 
 	while _stdio.is_open():
 		if _stdio.get_error() == OK:
-			var line := _stdio.get_line()
+			var line := _stdio.get_line() + line_ending
 
 			if use_bbcode_stderr:
 				line = line.replace("[", "[lb]")
@@ -102,7 +66,7 @@ func _shell(command: String, args: PackedStringArray) \
 			if line != "":
 				if use_bbcode_stderr:
 					line = "[color=#ff8888]" + line + "[/color]"
-				output.emit.call_deferred(line)
+				output.emit.call_deferred(line + line_ending)
 			else:
 				break
 	clean_thread()

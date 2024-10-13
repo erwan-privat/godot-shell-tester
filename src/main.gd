@@ -1,7 +1,12 @@
 extends PanelContainer
 
+# FIXME sleep 1 is ok with manual button run
+# but crashes with Ctrl+Enter
 
 const TMP_SCRIPT_PATH := "user://tmp_script"
+const USR_SHEBANG := "#!/usr/bin/env "
+
+# var _input_history: Array[String]
 
 
 func _input(event: InputEvent) -> void:
@@ -14,7 +19,7 @@ func _input(event: InputEvent) -> void:
 			paste_from_clipboard()
 			accept_event()
 	elif event.is_action("run"):
-		if Input.is_key_pressed(KEY_ENTER):
+		if Input.is_key_pressed(KEY_CTRL):
 			run()
 			accept_event()
 
@@ -22,11 +27,17 @@ func _input(event: InputEvent) -> void:
 func _create_tmp_script(content: String) -> void:
 	var f := FileAccess.open(TMP_SCRIPT_PATH,
 			FileAccess.WRITE)
+	f.store_string(USR_SHEBANG + %ShellTxt.text + "\n")
 	f.store_string(content)
 
 
-# func append_console(text: String) -> void:
+# func _register_history(command: String) -> void:
+# 	_input_history += command
+
+
+func append_console(text: String) -> void:
 	# %Console.text += text
+	%Console.append_text(text)
 
 
 func paste_from_clipboard() -> void:
@@ -34,12 +45,16 @@ func paste_from_clipboard() -> void:
 
 
 func run() -> void:
-	_create_tmp_script(%Input.text)
-	var global_script_path := ProjectSettings.globalize_path(
-		TMP_SCRIPT_PATH)
-	#%PipedShell.run(global_script_path, [], append_console)
+	var input = %Input.text
+	# TODO test sleep 1
+#	_register_history(text)
+	_create_tmp_script(input)
+	var global_script_path := \
+			ProjectSettings.globalize_path(TMP_SCRIPT_PATH)
 	%PipedShell.run(global_script_path)
-	%PipedShell.output.connect(%Console.append_text)
+
+	if %EraseBtn.button_pressed:
+		%Input.text = ""
 
 
 func request_quit() -> void:

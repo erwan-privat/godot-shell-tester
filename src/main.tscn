@@ -1,7 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://cyqjjas3plugi"]
+[gd_scene load_steps=5 format=3 uid="uid://cyqjjas3plugi"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_kamue"]
 [ext_resource type="Script" path="res://piped_shell.gd" id="2_w1xnr"]
+
+[sub_resource type="SystemFont" id="SystemFont_rgmtd"]
+font_names = PackedStringArray("Monospace")
 
 [sub_resource type="SystemFont" id="SystemFont_gmwnd"]
 font_names = PackedStringArray("Monospace")
@@ -29,17 +32,19 @@ layout_mode = 2
 
 [node name="ShellLbl" type="Label" parent="MarginContainer/VBoxContainer/ShellBox"]
 layout_mode = 2
-text = "Shell: "
+text = "#!/usr/bin/env "
 
-[node name="LineEdit" type="LineEdit" parent="MarginContainer/VBoxContainer/ShellBox"]
+[node name="ShellTxt" type="LineEdit" parent="MarginContainer/VBoxContainer/ShellBox"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "bash"
 
 [node name="Input" type="TextEdit" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
-size_flags_vertical = 3
+theme_override_fonts/font = SubResource("SystemFont_rgmtd")
 
 [node name="ButtonsHBox" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -52,26 +57,23 @@ text = "Paste (Ctrl+Shift+V)"
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="EraseBtn" type="CheckBox" parent="MarginContainer/VBoxContainer/ButtonsHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Erase input on run"
+
 [node name="RunBtn" type="Button" parent="MarginContainer/VBoxContainer/ButtonsHBox"]
 layout_mode = 2
 text = "Run (Ctrl+Enter)"
 
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
+[node name="Console" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 2.0
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-
-[node name="Console" type="RichTextLabel" parent="MarginContainer/VBoxContainer/MarginContainer"]
-unique_name_in_owner = true
-layout_mode = 2
 focus_mode = 2
 theme_override_fonts/normal_font = SubResource("SystemFont_gmwnd")
 theme_override_font_sizes/normal_font_size = 12
-bbcode_enabled = true
 scroll_following = true
 tab_size = 2
 context_menu_enabled = true
@@ -96,3 +98,4 @@ script = ExtResource("2_w1xnr")
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsHBox/PastBtn" to="." method="paste_from_clipboard"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsHBox/RunBtn" to="." method="run"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/QuitBtn" to="." method="request_quit"]
+[connection signal="output" from="PipedShell" to="." method="append_console"]
