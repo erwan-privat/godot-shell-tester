@@ -1,16 +1,15 @@
 class_name PipedShell
 extends Node
 ## PipedShell node is used to launch in a new thread a call
-## to `OS.execute_with_pipe` while printing asynchronously
-## stout and stderr with callback `print` function. Assumes
-## it will be used with a `RichTextLabel`, but the BBCode
-## formating can be disabled with the property
-## `use_bbcode_stderr`.
-## Note: do not use RichTextLabe.append_text for the
-## callback as it will not interpret the BBCode correctly.
-## a quick fix for that can be using a lambda function
-## appending directly like `func (t): $RichTextLabel += t`.
-## TODO add export var to activate auto \n,\r\n appending
+## to `OS.execute_with_pipe` while signaling output from
+## stdout and stderr. By default, this assumes it will be
+## used with a `RichTextLabel`, but the BBCode formating can
+## be disabled with the property `use_bbcode_stderr`.
+## Note: in some cases you should not use
+## `RichTextLabel.append_text` for the callback as it will
+## not interpret the BBCode correctly. A quick fix for that
+## can be using a lambda function appending directly like
+## `func (t): $RichTextLabel += t`.
 
 
 signal output(line: String)
@@ -30,7 +29,7 @@ func abort():
 	OS.kill(_pid)
 	print("killed pid ", _pid)
 	_pid = 0
-	_thread.wait_to_finish()
+	# _thread.wait_to_finish()
 	_thread = null
 	pass
 
@@ -38,7 +37,6 @@ func abort():
 func run(command: String, args: PackedStringArray = [],
 		) -> void:
 	abort()
-	assert(_thread == null)
 	_thread = Thread.new()
 	_thread.start(_shell.bind(command, args))
 

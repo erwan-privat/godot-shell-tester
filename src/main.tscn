@@ -82,9 +82,17 @@ selection_enabled = true
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 
+[node name="EmptyBtn" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Empty log (Ctrl+E)"
+
 [node name="Control" type="Control" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="AbortBtn" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Abort (Ctrl+D)"
 
 [node name="QuitBtn" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -97,5 +105,7 @@ script = ExtResource("2_w1xnr")
 
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsHBox/PastBtn" to="." method="paste_from_clipboard"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsHBox/RunBtn" to="." method="run"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/EmptyBtn" to="." method="empty_console"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/AbortBtn" to="." method="abort"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/QuitBtn" to="." method="request_quit"]
 [connection signal="output" from="PipedShell" to="." method="append_console"]

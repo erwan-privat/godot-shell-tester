@@ -4,30 +4,50 @@ extends PanelContainer
 # but crashes with Ctrl+Enter
 
 const TMP_SCRIPT_PATH := "user://tmp_script"
-const USR_SHEBANG := "#!/usr/bin/env "
+const SHEBANG := "#!/usr/bin/env "
+const INPUT_DELAY_SEC := 0.1
 
 # var _input_history: Array[String]
+var _in_input_delay := false
 
 
-func _input(event: InputEvent) -> void:
-	if event.is_action("quit"):
+func _process(_delta: float) -> void:
+	if _in_input_delay:
+		return
+
+	if Input.is_action_pressed("quit"):
 		request_quit()
-		accept_event()
-	elif event.is_action("paste"):
+	elif Input.is_action_pressed("paste"):
 		# fix Godot Ctrl+Shift
 		if Input.is_key_pressed(KEY_SHIFT):
+			print("event paste")
 			paste_from_clipboard()
-			accept_event()
-	elif event.is_action("run"):
+			delay_input()
+	elif Input.is_action_pressed("run"):
 		if Input.is_key_pressed(KEY_CTRL):
+			print("event run")
 			run()
-			accept_event()
+			delay_input()
+	elif Input.is_action_pressed("empty"):
+		print("event empty")
+		empty_console()
+		delay_input()
+	elif Input.is_action_pressed("abort"):
+		print("event abort")
+		abort()
+		delay_input()
 
 
 func _create_tmp_script(content: String) -> void:
 	var f := FileAccess.open(TMP_SCRIPT_PATH,
 			FileAccess.WRITE)
-	f.store_string(USR_SHEBANG + %ShellTxt.text + "\n")
+
+	if f == null:
+		error("Cannot open " + TMP_SCRIPT_PATH
+				+ " in write mode")
+		return
+	
+	f.store_string(SHEBANG + %ShellTxt.text + "\n")
 	f.store_string(content)
 
 
@@ -35,9 +55,31 @@ func _create_tmp_script(content: String) -> void:
 # 	_input_history += command
 
 
+func abort() -> void:
+	%PipedShell.abort()
+
+
 func append_console(text: String) -> void:
 	# %Console.text += text
 	%Console.append_text(text)
+
+
+func empty_console() -> void:
+	%Console.text = ""
+
+
+func error(text: String) -> void:
+	printerr(text)
+	var ed := %ErrorDialog
+	ed.title = "Error"
+	ed.dialog_text = msg
+	ed.popup_centered()
+
+
+func delay_input() -> void:
+	_in_input_delay = true
+	await get_tree().create_timer(INPUT_DELAY_SEC).timeout
+	_in_input_delay = false
 
 
 func paste_from_clipboard() -> void:
