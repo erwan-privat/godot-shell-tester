@@ -21,19 +21,23 @@ func _process(_delta: float) -> void:
 		# fix Godot Ctrl+Shift
 		if Input.is_key_pressed(KEY_SHIFT):
 			print("event paste")
+			accept_event()
 			paste_from_clipboard()
 			delay_input()
 	elif Input.is_action_pressed("run"):
 		if Input.is_key_pressed(KEY_CTRL):
 			print("event run")
+			accept_event()
 			run()
 			delay_input()
 	elif Input.is_action_pressed("empty"):
 		print("event empty")
+		accept_event()
 		empty_console()
 		delay_input()
 	elif Input.is_action_pressed("abort"):
 		print("event abort")
+		accept_event()
 		abort()
 		delay_input()
 

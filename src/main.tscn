@@ -103,6 +103,9 @@ text = "Quit (Ctrl+Q)"
 unique_name_in_owner = true
 script = ExtResource("2_w1xnr")
 
+[node name="ErrorDialog" type="AcceptDialog" parent="."]
+unique_name_in_owner = true
+
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsHBox/PastBtn" to="." method="paste_from_clipboard"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsHBox/RunBtn" to="." method="run"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/EmptyBtn" to="." method="empty_console"]

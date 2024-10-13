@@ -9,7 +9,9 @@ extends Node
 ## `RichTextLabel.append_text` for the callback as it will
 ## not interpret the BBCode correctly. A quick fix for that
 ## can be using a lambda function appending directly like
-## `func (t): $RichTextLabel += t`.
+## `func (t): $RichTextLabel += t`. But since now it reads
+## pipes line by line it should be ok.
+## FIXME puts all stderr after stdout, use redirect maybe?
 
 
 signal output(line: String)
@@ -72,3 +74,4 @@ func _shell(command: String, args: PackedStringArray) \
 func clean_thread():
 	_stdio.close()
 	OS.kill(_pid)
+	
