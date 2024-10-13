@@ -27,13 +27,11 @@ var _pid: int = 0
 func abort():
 	if _pid == 0:
 		return
-
 	OS.kill(_pid)
+	_stdio.close()
 	print("killed pid ", _pid)
 	_pid = 0
-	# _thread.wait_to_finish()
 	_thread = null
-	pass
 
 
 func run(command: String, args: PackedStringArray = [],
@@ -69,9 +67,5 @@ func _shell(command: String, args: PackedStringArray) \
 				output.emit.call_deferred(line + line_ending)
 			else:
 				break
-	clean_thread()
-	
-func clean_thread():
-	_stdio.close()
-	OS.kill(_pid)
-	
+	_thread.wait_to_finish.call_deferred()
+	abort.call_deferred()
