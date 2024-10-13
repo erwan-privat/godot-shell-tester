@@ -6,10 +6,12 @@ tester. You can choose the shebang, and provide a command or
 script in the application, and it will execute it with the
 `OS.execute_with_pipe` function of Godot 4.
 
-TODO
-----
+TODO and known bug
+------------------
 
 - [ ] Fix: entering a shortcut still passes text to the
   TextEdit control.
 - [ ] Fix: standard output is displayed entirely before
   standard error.
+- [ ] Fix: output is scrambled when two processes are
+  launched to fast.
