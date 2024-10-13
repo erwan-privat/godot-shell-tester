@@ -68,8 +68,8 @@ func empty_console() -> void:
 	%Console.text = ""
 
 
-func error(text: String) -> void:
-	printerr(text)
+func error(msg: String) -> void:
+	printerr(msg)
 	var ed := %ErrorDialog
 	ed.title = "Error"
 	ed.dialog_text = msg
