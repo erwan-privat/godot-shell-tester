@@ -73,5 +73,7 @@ func _shell(command: String, args: PackedStringArray) \
 				output.emit.call_deferred(line + line_ending)
 			else:
 				break
-	_thread.wait_to_finish.call_deferred()
+	
+	if _thread != null:
+		_thread.wait_to_finish.call_deferred()
 	abort.call_deferred()

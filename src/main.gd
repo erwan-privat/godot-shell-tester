@@ -5,41 +5,25 @@ extends PanelContainer
 
 const TMP_SCRIPT_PATH := "user://tmp_script"
 const SHEBANG := "#!/usr/bin/env "
-const INPUT_DELAY_SEC := 0.3
+
+# no const statically typed dictionary is GDScript
+var INPUT_DIC := {
+	&"abort": abort,
+	&"empty": empty_console,
+	&"paste": paste_from_clipboard,
+	&"quit": request_quit,
+	&"run": run,
+}
 
 # var _input_history: Array[String]
-var _in_input_delay := false
 
 
-func _process(_delta: float) -> void:
-	if _in_input_delay:
-		return
-
-	if Input.is_action_pressed("quit"):
-		request_quit()
-	elif Input.is_action_pressed("paste"):
-		# fix Godot Ctrl+Shift
-		if Input.is_key_pressed(KEY_SHIFT):
-			print("event paste")
+func _input(event: InputEvent) -> void:
+	for action in INPUT_DIC:
+		if event.is_action_pressed(action):
+			print(action)
+			INPUT_DIC[action].call()
 			accept_event()
-			paste_from_clipboard()
-			delay_input()
-	elif Input.is_action_pressed("run"):
-		if Input.is_key_pressed(KEY_CTRL):
-			print("event run")
-			accept_event()
-			run()
-			delay_input()
-	elif Input.is_action_pressed("empty"):
-		print("event empty")
-		accept_event()
-		empty_console()
-		delay_input()
-	elif Input.is_action_pressed("abort"):
-		print("event abort")
-		accept_event()
-		abort()
-		delay_input()
 
 
 func _create_tmp_script(content: String) -> void:
@@ -55,10 +39,6 @@ func _create_tmp_script(content: String) -> void:
 	f.store_string(content)
 
 
-# func _register_history(command: String) -> void:
-# 	_input_history += command
-
-
 func abort() -> void:
 	%PipedShell.abort()
 
@@ -69,6 +49,7 @@ func append_console(text: String) -> void:
 
 
 func empty_console() -> void:
+	print("empty console")
 	%Console.text = ""
 
 
@@ -80,19 +61,12 @@ func error(msg: String) -> void:
 	ed.popup_centered()
 
 
-func delay_input() -> void:
-	_in_input_delay = true
-	await get_tree().create_timer(INPUT_DELAY_SEC).timeout
-	_in_input_delay = false
-
-
 func paste_from_clipboard() -> void:
 	%Input.text = DisplayServer.clipboard_get()
 
 
 func run() -> void:
 	var input = %Input.text
-	# TODO test sleep 1
 #	_register_history(text)
 	_create_tmp_script(input)
 	var global_script_path := \
